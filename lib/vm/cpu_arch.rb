@@ -40,8 +40,6 @@ module Vm
         argtypes.size
       end
 
-      private
-
       def self.make(name, argtypes, operation)
         if operation.nil?
           raise ArgumentError, "invalid opcode '#{name}': no operation"
