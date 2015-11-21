@@ -6,13 +6,14 @@ module Vm
   class Cpu
     include CpuArch
 
-    attr_reader :registers
+    attr_reader :registers, :debugger
 
     # shorthand for instructions
     alias_method :r, :registers
 
-    def initialize
+    def initialize(debugger)
       @registers = []
+      @debugger = debugger
     end
 
     def execute(bytecode)
@@ -20,13 +21,9 @@ module Vm
       opcode_execute(instruction)
     end
 
-    def core_dump
-      dump_opcodes
-      dump_registers
-    end
-
-    def reg
-      registers
+    def core_dump # B-B-B-B-BWHAHAHAHA
+      opcodes = self.class.opcodes.values
+      debugger.core_dump(opcodes, registers)
     end
 
     private
@@ -34,20 +31,6 @@ module Vm
     def opcode_execute(instruction)
       opcode = self.class.opcodes[instruction.opcode]
       opcode.execute(self, *instruction.operands)
-    end
-
-    def dump_opcodes
-      puts '------ OPCODES ------'
-      self.class.opcodes.each_key do |opcode|
-        puts opcode
-      end
-    end
-
-    def dump_registers
-      puts '----- REGISTERS -----'
-      registers.each_with_index do |value, slot|
-        puts "#{slot}: #{value}"
-      end
     end
   end
 end

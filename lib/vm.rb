@@ -1,10 +1,12 @@
 require 'vm/cpu'
 require 'vm/instruction'
 require 'vm/version'
+require 'vm/debuggers/cli_debugger'
 
 module Vm
   def self.start
-    cpu = Cpu.new
+    debugger = Debuggers::CliDebugger.new
+    cpu = Cpu.new(debugger)
 
     loop do
       begin
