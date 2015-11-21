@@ -8,6 +8,9 @@ module Vm
 
     attr_reader :registers
 
+    # shorthand for instructions
+    alias_method :r, :registers
+
     def initialize
       @registers = []
     end
