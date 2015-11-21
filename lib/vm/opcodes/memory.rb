@@ -6,7 +6,7 @@ module Vm
       include CpuArch
 
       opcode :mov, argtypes: [:reg, :lit],
-        operation: ->(dst, val) { reg[dst] = val },
+        operation: ->(dst, val) { r[dst] = val },
         description: <<-DESC
           Move literal value b into register a.
         DESC
