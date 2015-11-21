@@ -1,6 +1,8 @@
 module Vm
   module CpuArch
-     def self.included(base)
+    InvalidOpcodeError = Class.new(StandardError)
+
+    def self.included(base)
       base.extend(ClassMethods)
       @opcodes ||= {}
     end
@@ -18,7 +20,7 @@ module Vm
         if !opcodes.key?(name)
           opcodes[name] = Opcode.make(name, argtypes, operation)
         else
-          raise ArgumentError, "invalid opcode '#{name}': already defined"
+          raise InvalidOpcodeError, "invalid opcode '#{name}': already defined"
         end
       end
     end
@@ -42,9 +44,9 @@ module Vm
 
       def self.make(name, argtypes, operation)
         if operation.nil?
-          raise ArgumentError, "invalid opcode '#{name}': no operation"
+          raise InvalidOpcodeError, "invalid opcode '#{name}': no operation"
         elsif argtypes.size != operation.arity
-          raise ArgumentError, "invalid opcode '#{name}': arity mismatch"
+          raise InvalidOpcodeError, "invalid opcode '#{name}': arity mismatch"
         else
           self.new(name, argtypes, operation)
         end

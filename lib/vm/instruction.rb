@@ -2,6 +2,8 @@ require 'vm/cpu_arch'
 
 module Vm
   class Instruction
+    BadInstrError = Class.new(StandardError)
+
     attr_reader :opcode, :operands
 
     def initialize(opcode, operands)
@@ -18,9 +20,9 @@ module Vm
 
     def self.construct(opcode, operands)
       if !opcode?(opcode)
-        raise ArgumentError, 'unknown opcode'
+        raise BadInstrError, 'unknown opcode'
       elsif !valid_operand_size?(opcode, operands)
-        raise ArgumentError, 'invalid number of operands'
+        raise BadInstrError, 'invalid number of operands'
       else
         self.new(opcode, operands)
       end
