@@ -20,11 +20,11 @@ module Vm
 
     def self.construct(opcode, operands)
       if !opcode?(opcode)
-        raise BadInstrError, 'unknown opcode'
+        fail_instr('unknown opcode')
       elsif !valid_operand_size?(opcode, operands)
-        raise BadInstrError, 'invalid number of operands'
+        fail_instr('invalid number of operands')
       else
-        self.new(opcode, operands)
+        new(opcode, operands)
       end
     end
 
@@ -34,6 +34,10 @@ module Vm
 
     def self.valid_operand_size?(opcode, operands)
       operands.size == CpuArch.opcodes[opcode].arity
+    end
+
+    def self.fail_instr(error)
+      raise BadInstrError, error
     end
   end
 end
