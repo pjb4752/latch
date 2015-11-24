@@ -1,9 +1,9 @@
-require 'vm/cpu'
-require 'vm/instruction'
-require 'vm/version'
-require 'vm/debuggers/cli_debugger'
+require 'latch/cpu'
+require 'latch/instruction'
+require 'latch/version'
+require 'latch/debuggers/cli_debugger'
 
-module Vm
+module Latch
   module SafeIO
     def with_io(result: true)
       begin

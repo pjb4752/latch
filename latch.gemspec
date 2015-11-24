@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'vm/version'
+require 'latch/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'vm'
-  spec.version       = Vm::VERSION
+  spec.name          = 'latch'
+  spec.version       = Latch::VERSION
   spec.authors       = ['pjb4752']
   spec.email         = ['pjb4752@gmail.com']
 

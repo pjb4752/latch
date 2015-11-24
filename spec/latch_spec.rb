@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Vm do
+describe Latch do
   it 'has a version number' do
-    expect(Vm::VERSION).not_to be nil
+    expect(Latch::VERSION).not_to be nil
   end
 
   it 'does something useful' do

@@ -1,4 +1,4 @@
-module Vm
+module Latch
   module Debuggers
     class CliDebugger
 

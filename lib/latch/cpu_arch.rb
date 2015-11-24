@@ -1,4 +1,4 @@
-module Vm
+module Latch
   module CpuArch
     InvalidOpcodeError = Class.new(StandardError)
 

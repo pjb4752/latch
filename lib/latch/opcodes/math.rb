@@ -1,6 +1,6 @@
-require 'vm/cpu_arch'
+require 'latch/cpu_arch'
 
-module Vm
+module Latch
   module Opcodes
     module Math
       include CpuArch
@@ -41,6 +41,41 @@ module Vm
           Place result in register a.
         DESC
 
+      # literal-based arithmetic
+      opcode :addl, argtypes: [:reg, :reg, :lit],
+        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] + rhs },
+        description: <<-DESC
+          Add contents of register b and literal c.
+          Place result in register a.
+        DESC
+
+      opcode :subl, argtypes: [:reg, :reg, :lit],
+        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] - rhs },
+        description: <<-DESC
+          Subtract contents of literal c from register b.
+          Place result in register a.
+        DESC
+
+      opcode :mull, argtypes: [:reg, :reg, :lit],
+        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] * rhs },
+        description: <<-DESC
+          Multiply contents of registers b and literal c.
+          Place result in register a.
+        DESC
+
+      opcode :divl, argtypes: [:reg, :reg, :lit],
+        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] / rhs },
+        description: <<-DESC
+          Divide contents of register b by literal c.
+          Place result in register a.
+        DESC
+
+      opcode :modl, argtypes: [:reg, :reg, :lit],
+        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] % rhs },
+        description: <<-DESC
+          Find remainder of division of register b by literal c.
+          Place result in register a.
+        DESC
     end
   end
 end

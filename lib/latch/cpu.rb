@@ -1,8 +1,8 @@
-require 'vm/cpu_arch'
-require 'vm/instruction'
-require 'vm/opcodes/all'
+require 'latch/cpu_arch'
+require 'latch/instruction'
+require 'latch/opcodes/all'
 
-module Vm
+module Latch
   class Cpu
     include CpuArch
 

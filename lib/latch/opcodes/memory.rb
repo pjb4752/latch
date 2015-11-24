@@ -1,6 +1,6 @@
-require 'vm/cpu_arch'
+require 'latch/cpu_arch'
 
-module Vm
+module Latch
   module Opcodes
     module Memory
       include CpuArch
