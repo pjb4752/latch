@@ -11,7 +11,15 @@ module Vm
       attr_reader :opcodes
     end
 
+    module OpcodeErrors
+      def fail_opcode(opname, error)
+        raise InvalidOpcodeError, "invalid opcode '#{opname}': #{error}"
+      end
+    end
+
     module ClassMethods
+      include OpcodeErrors
+
       def opcodes
         CpuArch.opcodes
       end
@@ -20,12 +28,14 @@ module Vm
         if !opcodes.key?(name)
           opcodes[name] = Opcode.make(name, argtypes, operation, description)
         else
-          raise InvalidOpcodeError, "invalid opcode '#{name}': already defined"
+          fail_opcode(name, 'already defined')
         end
       end
     end
 
     class Opcode
+      extend OpcodeErrors
+
       attr_reader :name, :argtypes, :operation, :description
 
       def initialize(name, argtypes, operation, description)
@@ -45,11 +55,11 @@ module Vm
 
       def self.make(name, argtypes, operation, description)
         if operation.nil?
-          raise InvalidOpcodeError, "invalid opcode '#{name}': no operation"
+          fail_opcode(name, 'no operation given')
         elsif argtypes.size != operation.arity
-          raise InvalidOpcodeError, "invalid opcode '#{name}': arity mismatch"
+          fail_opcode(name, 'arity mismatch')
         else
-          self.new(name, argtypes, operation, description)
+          new(name, argtypes, operation, description)
         end
       end
     end
