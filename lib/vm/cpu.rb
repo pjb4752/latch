@@ -21,9 +21,12 @@ module Vm
       opcode_execute(instruction)
     end
 
+    def opcode_dump
+      debugger.opcode_dump(self.class.opcodes.values)
+    end
+
     def core_dump # B-B-B-B-BWHAHAHAHA
-      opcodes = self.class.opcodes.values
-      debugger.core_dump(opcodes, registers)
+      debugger.core_dump(registers)
     end
 
     private

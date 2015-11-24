@@ -2,14 +2,14 @@ module Vm
   module Debuggers
     class CliDebugger
 
-      def core_dump(opcodes, registers)
-        dump_opcodes(opcodes)
-        dump_registers(registers)
+      def core_dump(registers)
+        puts '----- REGISTERS -----'
+        registers.each_with_index do |value, slot|
+          puts "#{slot}: #{value}"
+        end
       end
 
-      private
-
-      def dump_opcodes(opcodes)
+      def opcode_dump(opcodes)
         puts '------ OPCODES ------'
         opcodes.each do |opcode|
           dump_opcode_details(opcode.name, opcode.argtypes)
@@ -19,12 +19,7 @@ module Vm
         end
       end
 
-      def dump_registers(registers)
-        puts '----- REGISTERS -----'
-        registers.each_with_index do |value, slot|
-          puts "#{slot}: #{value}"
-        end
-      end
+      private
 
       def dump_opcode_details(name, argtypes)
         argslist = argtypes.join(', ')

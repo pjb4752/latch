@@ -4,45 +4,72 @@ require 'vm/version'
 require 'vm/debuggers/cli_debugger'
 
 module Vm
-  def self.start
-    debugger = Debuggers::CliDebugger.new
-    cpu = Cpu.new(debugger)
-
-    loop do
+  module SafeIO
+    def with_io(result: true)
       begin
-        cpu.core_dump
-        bytecode = read_input
+        yield if block_given?
+      rescue IOError => e
+        $stderr.puts "IO failed: #{e.message}"
+      end
+      result
+    end
+  end
 
-        break if nil_handled?(bytecode)
-        next if empty_handled?(bytecode)
+  class Vm
+    include SafeIO
 
-        cpu.execute(bytecode)
-      rescue Instruction::BadInstrError => e
-        $stderr.puts "error: #{e.message}"
+    attr_reader :cpu
+
+    def initialize(debugger = Debuggers::CliDebugger.new)
+      @cpu = Cpu.new(debugger)
+    end
+
+    def run
+      loop do
+        begin
+          input = read_input
+
+          break if nil_handled?(input)
+          next if empty_handled?(input)
+          next if control_handled?(input)
+
+          cpu.execute(input)
+        rescue Instruction::BadInstrError => e
+          $stderr.puts "error: #{e.message}"
+        end
+      end
+    end
+
+    private
+
+    def read_input
+      print '=> '
+      gets
+    end
+
+    def nil_handled?(input)
+      if input.nil?
+        with_io { puts 'bye' }
+      end
+    end
+
+    def empty_handled?(input)
+      input.chomp!
+      if input.empty?
+        with_io { puts 'no input given, retry' }
+      end
+    end
+
+    def control_handled?(input)
+      case input
+      when '\c' then with_io { cpu.core_dump }
+      when '\o' then with_io { cpu.opcode_dump }
+      else false
       end
     end
   end
 
-  private
-
-  def self.read_input
-    print '=> '
-    gets
-  end
-
-  def self.nil_handled?(bytecode)
-    if bytecode.nil?
-      puts 'bye'
-      true
-    end
-  end
-
-  def self.empty_handled?(bytecode)
-    bytecode.chomp!
-    if bytecode.empty?
-      puts 'no bytecode given, retry'
-      sleep 1.0
-      true
-    end
+  def self.start
+    Vm.new.run
   end
 end
