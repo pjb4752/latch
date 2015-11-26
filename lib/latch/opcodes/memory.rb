@@ -5,10 +5,16 @@ module Latch
     module Memory
       include CpuArch
 
-      opcode :mov, argtypes: [:reg, :lit],
+      opcode :mov, argtypes: [:reg, :reg],
         operation: ->(dst, val) { r[dst] = val },
         description: <<-DESC
-          Move literal value b into register a.
+          Copy register value b into register a.
+        DESC
+
+      opcode :lnum, argtypes: [:reg, :num],
+        operation: ->(dst, val) { r[dst] = val },
+        description: <<-DESC
+          Load numeric literal b into register a.
         DESC
 
     end

@@ -1,6 +1,6 @@
 module Latch
   module CpuArch
-    InvalidOpcodeError = Class.new(StandardError)
+    OPERAND_TYPES = [:reg, :num]
 
     def self.included(base)
       base.extend(ClassMethods)
@@ -11,17 +11,43 @@ module Latch
       attr_reader :opcodes
     end
 
-    module OpcodeErrors
+    module Validation
+      InvalidOpcodeError = Class.new(StandardError)
+
+      def validate(name, argtypes, operation)
+        if operation.nil?
+          fail_opcode(name, 'no operation given')
+        elsif argtypes.size != operation.arity
+          fail_opcode(name, 'arity mismatch')
+        elsif !valid_operand_types?(argtypes)
+          fail_opcode(name, 'invalid operand type')
+        end
+      end
+
       def fail_opcode(opname, error)
-        raise InvalidOpcodeError, "invalid opcode '#{opname}': #{error}"
+        raise InvalidOpcodeError, "bad opcode definition '#{opname}': #{error}"
+      end
+
+      private
+
+      def valid_operand_types?(argtypes)
+        argtypes.all? { |a| OPERAND_TYPES.include?(a) }
       end
     end
 
     module ClassMethods
-      include OpcodeErrors
+      include Validation
 
       def opcodes
         CpuArch.opcodes
+      end
+
+      def register?(type)
+        type == :reg
+      end
+
+      def numeric_literal?(type)
+        type == :num
       end
 
       def opcode(name, argtypes: [], operation: nil, description: 'Nodoc')
@@ -34,7 +60,7 @@ module Latch
     end
 
     class Opcode
-      extend OpcodeErrors
+      extend Validation
 
       attr_reader :name, :argtypes, :operation, :description
 
@@ -54,13 +80,8 @@ module Latch
       end
 
       def self.make(name, argtypes, operation, description)
-        if operation.nil?
-          fail_opcode(name, 'no operation given')
-        elsif argtypes.size != operation.arity
-          fail_opcode(name, 'arity mismatch')
-        else
-          new(name, argtypes, operation, description)
-        end
+        validate(name, argtypes, operation)
+        new(name, argtypes, operation, description)
       end
     end
   end

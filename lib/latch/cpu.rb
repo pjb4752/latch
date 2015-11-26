@@ -17,7 +17,7 @@ module Latch
     end
 
     def execute(bytecode)
-      instruction = Instruction.decode(bytecode)
+      instruction = Instructions.decode(bytecode)
       opcode_execute(instruction)
     end
 

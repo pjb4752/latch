@@ -42,40 +42,41 @@ module Latch
         DESC
 
       # literal-based arithmetic
-      opcode :addl, argtypes: [:reg, :reg, :lit],
+      opcode :addl, argtypes: [:reg, :reg, :num],
         operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] + rhs },
         description: <<-DESC
           Add contents of register b and literal c.
           Place result in register a.
         DESC
 
-      opcode :subl, argtypes: [:reg, :reg, :lit],
+      opcode :subl, argtypes: [:reg, :reg, :num],
         operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] - rhs },
         description: <<-DESC
           Subtract contents of literal c from register b.
           Place result in register a.
         DESC
 
-      opcode :mull, argtypes: [:reg, :reg, :lit],
+      opcode :mull, argtypes: [:reg, :reg, :num],
         operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] * rhs },
         description: <<-DESC
           Multiply contents of registers b and literal c.
           Place result in register a.
         DESC
 
-      opcode :divl, argtypes: [:reg, :reg, :lit],
+      opcode :divl, argtypes: [:reg, :reg, :num],
         operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] / rhs },
         description: <<-DESC
           Divide contents of register b by literal c.
           Place result in register a.
         DESC
 
-      opcode :modl, argtypes: [:reg, :reg, :lit],
+      opcode :modl, argtypes: [:reg, :reg, :num],
         operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] % rhs },
         description: <<-DESC
           Find remainder of division of register b by literal c.
           Place result in register a.
         DESC
+
     end
   end
 end
