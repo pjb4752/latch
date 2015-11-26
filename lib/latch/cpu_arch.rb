@@ -1,6 +1,6 @@
 module Latch
   module CpuArch
-    OPERAND_TYPES = [:reg, :num]
+    OPERAND_TYPES = [:reg, :num, :str]
 
     def self.included(base)
       base.extend(ClassMethods)
@@ -48,6 +48,10 @@ module Latch
 
       def numeric_literal?(type)
         type == :num
+      end
+
+      def string_literal?(type)
+        type == :str
       end
 
       def opcode(name, argtypes: [], operation: nil, description: 'Nodoc')

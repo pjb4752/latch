@@ -38,6 +38,7 @@ module Latch
         case
         when register?(type) then numeric?(op)
         when numeric_literal?(type) then numeric?(op)
+        when string_literal?(type) then string?(op)
         else false
         end
       end
@@ -45,11 +46,25 @@ module Latch
       def numeric?(op)
         op =~ /\d+/
       end
+
+      def string?(op)
+        op =~ /".*"/
+      end
     end
 
     module Conversion
       def convert(opcode, operands)
-        operands.map(&:to_i)
+        argtypes = opcodes[opcode].argtypes
+        argtypes.zip(operands).map { |type, op| convert_operand(type, op) }
+      end
+
+      private
+
+      def convert_operand(type, op)
+        case
+        when register?(type), numeric_literal?(type) then op.to_i
+        when string_literal?(type) then op.gsub(/"/, '')
+        end
       end
     end
 
