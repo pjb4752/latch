@@ -34,8 +34,10 @@ module Latch
           next if control_handled?(input)
 
           cpu.execute(input)
-        rescue Instructions::Validation::BadInstrError => e
-          $stderr.puts "error: #{e.message}"
+        rescue Instructions::Validation::BadInstrError => bie
+          $stderr.puts "error: #{bie.message}"
+        rescue TypeError => te
+          $stderr.puts "error: #{te.message}"
         end
       end
     end
