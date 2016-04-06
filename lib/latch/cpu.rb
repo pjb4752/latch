@@ -2,31 +2,38 @@ require 'latch/cpu_arch'
 require 'latch/instruction'
 require 'latch/opcodes/all'
 
+require 'observer'
+
 module Latch
   class Cpu
     include CpuArch
+    include Observable
 
-    attr_reader :registers, :debugger
+    class State
+      attr_reader :globals, :registers
 
-    # shorthand for instructions
-    alias_method :r, :registers
+      def initialize
+        @globals = {}
+        @registers = []
+      end
 
-    def initialize(debugger)
-      @registers = []
-      @debugger = debugger
+      # shorthand for instructions
+      alias_method :g, :globals
+      alias_method :r, :registers
+    end
+
+    attr_reader :state
+
+    def initialize(state = State.new)
+      @state = state
     end
 
     def execute(bytecode)
       instruction = Instructions.decode(bytecode)
       opcode_execute(instruction)
-    end
 
-    def opcode_dump
-      debugger.opcode_dump(self.class.opcodes.values)
-    end
-
-    def core_dump # B-B-B-B-BWHAHAHAHA
-      debugger.core_dump(registers)
+      changed # let Observable know state has changed
+      notify_observers(instruction, state)
     end
 
     private

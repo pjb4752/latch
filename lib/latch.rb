@@ -1,72 +1,41 @@
+require 'latch/network/packet_stream'
 require 'latch/cpu'
-require 'latch/instruction'
+require 'latch/cpu_monitor'
 require 'latch/version'
-require 'latch/debuggers/cli_debugger'
+
+require 'socket'
 
 module Latch
-  module SafeIO
-    def with_io(result: true)
-      begin
-        yield if block_given?
-      rescue IOError => e
-        $stderr.puts "IO failed: #{e.message}"
-      end
-      result
-    end
-  end
-
   class Vm
-    include SafeIO
 
-    attr_reader :cpu
+    attr_reader :cpu, :monitor
 
-    def initialize(debugger = Debuggers::CliDebugger.new)
-      @cpu = Cpu.new(debugger)
+    def initialize(monitor = CpuMonitor.new)
+      @cpu = Cpu.new
+      @cpu.add_observer(monitor)
+      @monitor = monitor
     end
 
     def run
-      loop do
-        begin
-          input = read_input
+      Socket.unix_server_socket('/tmp/latch.sock') do |server|
+        remote, addrinfo = server.accept
+        stream = Network::PacketStream.new(remote)
 
-          break if nil_handled?(input)
-          next if empty_handled?(input)
-          next if control_handled?(input)
-
-          cpu.execute(input)
-        rescue Instructions::Validation::BadInstrError => bie
-          $stderr.puts "error: #{bie.message}"
-        rescue TypeError => te
-          $stderr.puts "error: #{te.message}"
+        loop do
+          stream.pending.each do |packet|
+            handle_packet(packet)
+          end
         end
       end
     end
 
     private
 
-    def read_input
-      print '=> '
-      gets
-    end
-
-    def nil_handled?(input)
-      if input.nil?
-        with_io { puts 'bye' }
-      end
-    end
-
-    def empty_handled?(input)
-      input.chomp!
-      if input.empty?
-        with_io { puts 'no input given, retry' }
-      end
-    end
-
-    def control_handled?(input)
-      case input
-      when '\c' then with_io { cpu.core_dump }
-      when '\o' then with_io { cpu.opcode_dump }
-      else false
+    def handle_packet(packet)
+      if packet.metadata?
+        monitor.fetch(packet.metadata)
+      elsif packet.instruction?
+        cpu.execute(packet)
       end
     end
   end
