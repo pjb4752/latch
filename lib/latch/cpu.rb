@@ -1,6 +1,6 @@
 require 'latch/cpu_arch'
 require 'latch/instruction'
-require 'latch/opcodes/all'
+require 'latch/instruction_set/all'
 
 require 'observer'
 
@@ -30,7 +30,7 @@ module Latch
 
     def execute(bytecode)
       instruction = Instructions.decode(bytecode)
-      opcode_execute(instruction)
+      instruction_execute(instruction)
 
       changed # let Observable know state has changed
       notify_observers(instruction, state)
@@ -38,9 +38,9 @@ module Latch
 
     private
 
-    def opcode_execute(instruction)
-      opcode = self.class.opcodes[instruction.opcode]
-      opcode.execute(self, *instruction.operands)
+    def instruction_execute(instruction)
+      instr = self.class.instructions[instruction.opcode]
+      instr.execute(self, *instruction.operands)
     end
   end
 end

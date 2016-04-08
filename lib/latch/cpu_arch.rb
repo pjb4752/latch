@@ -1,45 +1,49 @@
 module Latch
   module CpuArch
-    OPERAND_TYPES = [:reg, :num, :str]
+
+    OPERAND_TYPES = [:rega, :regn, :regs, :regk, :regm,
+                     :lita, :litn, :lits, :litk, :litm,
+                     :glba, :glbn, :glbs, :glbk, :glbm]
 
     def self.included(base)
       base.extend(ClassMethods)
-      @opcodes ||= {}
+      @instructions ||= {}
     end
 
     class << self
-      attr_reader :opcodes
+      attr_reader :instructions
     end
 
     module Validation
-      InvalidOpcodeError = Class.new(StandardError)
+      InvalidInstructionError = Class.new(StandardError)
 
-      def validate(name, argtypes, operation)
+      def validate(name, operands, operation)
         if operation.nil?
-          fail_opcode(name, 'no operation given')
-        elsif argtypes.size != operation.arity
-          fail_opcode(name, 'arity mismatch')
-        elsif !valid_operand_types?(argtypes)
-          fail_opcode(name, 'invalid operand type')
+          fail_instruction(name, 'no operation given')
+        elsif operands.size != operation.arity
+          fail_instruction(name, 'arity mismatch')
+        elsif !valid_operand_types?(operands)
+          fail_instruction(name, 'invalid operand type')
         end
       end
 
-      def fail_opcode(opname, error)
-        raise InvalidOpcodeError, "bad opcode definition '#{opname}': #{error}"
+      def fail_instruction(name, error)
+        message = "bad instruction definition '#{name}': #{error}"
+        raise InvalidInstructionError, message
       end
 
       private
 
-      def valid_operand_types?(argtypes)
-        argtypes.all? { |a| OPERAND_TYPES.include?(a) }
+      def valid_operand_types?(operands)
+        operands.all? { |a| OPERAND_TYPES.include?(a) }
       end
     end
 
     module ClassMethods
       include Validation
 
-      def opcodes
-        CpuArch.opcodes
+      def instructions
+        CpuArch.instructions
       end
 
       def register?(type)
@@ -54,23 +58,25 @@ module Latch
         type == :str
       end
 
-      def opcode(name, argtypes: [], operation: nil, description: 'Nodoc')
-        if !opcodes.key?(name)
-          opcodes[name] = Opcode.make(name, argtypes, operation, description)
+      def instruction(name, operands: [], operation: nil, description: 'Nodoc')
+        if !instructions.key?(name)
+          validate(name, operands, operation)
+
+          instruction = Instruction.new(name, operands, operation, description)
+          instructions[name] = instruction
         else
-          fail_opcode(name, 'already defined')
+          fail_instruction(name, 'already defined')
         end
       end
     end
 
-    class Opcode
-      extend Validation
+    class Instruction
 
-      attr_reader :name, :argtypes, :operation, :description
+      attr_reader :name, :operands, :operation, :description
 
-      def initialize(name, argtypes, operation, description)
+      def initialize(name, operands, operation, description)
         @name = name
-        @argtypes = argtypes
+        @operands = operands
         @operation = operation
         @description = description
       end
@@ -80,12 +86,7 @@ module Latch
       end
 
       def arity
-        argtypes.size
-      end
-
-      def self.make(name, argtypes, operation, description)
-        validate(name, argtypes, operation)
-        new(name, argtypes, operation, description)
+        operands.size
       end
     end
   end
