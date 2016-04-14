@@ -11,21 +11,46 @@ module Latch
 
     class State
       attr_reader :globals, :registers
+      attr_accessor :cmp_register, :ret_register
 
       def initialize
         @globals = {}
         @registers = []
-      end
 
-      # shorthand for instructions
-      alias_method :g, :globals
-      alias_method :r, :registers
+        # special registers
+        @cmp_register = nil
+        @ret_register = nil
+      end
     end
 
     attr_reader :state
 
     def initialize(state = State.new)
       @state = state
+    end
+
+    def reg
+      state.registers
+    end
+
+    def glb
+      state.globals
+    end
+
+    def cmp
+      state.cmp_register
+    end
+
+    def cmp=(value)
+      state.cmp_register = value
+    end
+
+    def rvl
+      state.ret_register
+    end
+
+    def rvl=(value)
+      state.ret_register = value
     end
 
     def execute(bytecode)
