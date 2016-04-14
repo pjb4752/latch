@@ -5,46 +5,46 @@ module Latch
     module Test
       include CpuArch
 
-      instruction :eql, operands: [:rega, :regb],
-        operation: ->(left, right) { puts 'not implemented' },
+      instruction :eql, opcode: 0x10, operands: [:rega, :rega],
+        operation: ->(lhs, rhs) { cmp = reg[lhs] == reg[rhs] },
         description: <<-DESC
           Test equality of contents of register a and register b.
           The result of the test is placed in the special compare register.
         DESC
 
-      instruction :neql, operands: [:rega, :regb],
-        operation: ->(left, right) { puts 'not implemented' },
+      instruction :neql, opcode: 0x11, operands: [:rega, :rega],
+        operation: ->(lhs, rhs) { cmp = reg[lhs] != reg[rhs] },
         description: <<-DESC
           Test non-equality of contents of register a and register b.
           The result of the test is placed in the special compare register.
         DESC
 
-      instruction :ltn, operands: [:rega, :regb],
-        operation: ->(left, right) { puts 'not implemented' },
+      instruction :ltn, opcode: 0x12, operands: [:rega, :rega],
+        operation: ->(lhs, rhs) { cmp = reg[lhs] < reg[rhs] },
         description: <<-DESC
           Test if contents of register a are less than the contents of
           register b.  The result of the test is placed in the special compare
           register.
         DESC
 
-      instruction :lte, operands: [:rega, :regb],
-        operation: ->(left, right) { puts 'not implemented' },
+      instruction :lte, opcode: 0x13, operands: [:rega, :rega],
+        operation: ->(lhs, rhs) { cmp = reg[lhs] <= reg[rhs] },
         description: <<-DESC
           Test if contents of register a are less than or equal to the contents
           of register b.  The result of the test is placed in the special
           compare register.
         DESC
 
-      instruction :gtn, operands: [:rega, :regb],
-        operation: ->(left, right) { puts 'not implemented' },
+      instruction :gtn, opcode: 0x14, operands: [:rega, :rega],
+        operation: ->(lhs, rhs) { cmp = reg[lhs] > reg[rhs] },
         description: <<-DESC
           Test if contents of register a are greater than the contents of
           register b.  The result of the test is placed in the special compare
           register.
         DESC
 
-      instruction :gte, operands: [:rega, :regb],
-        operation: ->(left, right) { puts 'not implemented' },
+      instruction :gte, opcode: 0x15, operands: [:rega, :rega],
+        operation: ->(lhs, rhs) { cmp = reg[lhs] >= reg[rhs] },
         description: <<-DESC
           Test if contents of register a are greater than or equal to the
           contents of register b.  The result of the test is placed in the

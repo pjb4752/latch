@@ -6,75 +6,75 @@ module Latch
       include CpuArch
 
       # register-based arithmetic
-      instruction :addr, operands: [:rega, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] + r[rhs] },
+      instruction :addr, opcode: 0x06, operands: [:rega, :regn, :regn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] + reg[rhs] },
         description: <<-DESC
-          Add contents of register b and register c.
-          Place result in register a.
+          Add contents of operand registers and store result in destination
+          register.
         DESC
 
-      instruction :subr, operands: [:rega, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] - r[rhs] },
+      instruction :subr, opcode: 0x07, operands: [:rega, :regn, :regn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] - reg[rhs] },
         description: <<-DESC
-          Subtract contents of register c from register b.
-          Place result in register a.
+          Subtract contents of operand registers and store result in
+          destination register.
         DESC
 
-      instruction :mulr, operands: [:rega, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] * r[rhs] },
+      instruction :mulr, opcode: 0x08, operands: [:rega, :regn, :regn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] * reg[rhs] },
         description: <<-DESC
-          Multiply contents of registers b and register c.
-          Place result in register a.
+          Multiply contents of operand registers and store result in
+          destination register.
         DESC
 
-      instruction :divr, operands: [:rega, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] / r[rhs] },
+      instruction :divr, opcode: 0x09, operands: [:rega, :regn, :regn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] / reg[rhs] },
         description: <<-DESC
-          Divide contents of register b by register c.
-          Place result in register a.
+          Divide contents of operand registers and store result in destination
+          register.
         DESC
 
-      instruction :modr, operands: [:rega, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] % r[rhs] },
+      instruction :modr, opcode: 0x0A, operands: [:rega, :regn, :regn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] % reg[rhs] },
         description: <<-DESC
-          Find remainder of division of register b by register c.
-          Place result in register a.
+          Find remainder of division of operand registers and store result in
+          destination register.
         DESC
 
       # literal-based arithmetic
-      instruction :addl, operands: [:rega, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] + rhs },
+      instruction :addl, opcode: 0x0B, operands: [:rega, :regn, :litn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] + rhs },
         description: <<-DESC
-          Add contents of register b and literal c.
-          Place result in register a.
+          Add contents of operand register and literal and store results in
+          destination register.
         DESC
 
-      instruction :subl, operands: [:rega, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] - rhs },
+      instruction :subl, opcode: 0x0C, operands: [:rega, :regn, :litn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] - rhs },
         description: <<-DESC
-          Subtract contents of literal c from register b.
-          Place result in register a.
+          Subtract contents of operand register and literal and store results
+          in destination register.
         DESC
 
-      instruction :mull, operands: [:rega, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] * rhs },
+      instruction :mull, opcode: 0x0D, operands: [:rega, :regn, :litn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] * rhs },
         description: <<-DESC
-          Multiply contents of registers b and literal c.
-          Place result in register a.
+          Multiply contents of operand register and literal and store results
+          in destination register.
         DESC
 
-      instruction :divl, operands: [:rega, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] / rhs },
+      instruction :divl, opcode: 0x0E, operands: [:rega, :regn, :litn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] / rhs },
         description: <<-DESC
-          Divide contents of register b by literal c.
-          Place result in register a.
+          Divide contents of operand register and literal and store results in
+          destination register.
         DESC
 
-      instruction :modl, operands: [:rega, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { r[dst] = r[lhs] % rhs },
+      instruction :modl, opcode: 0x0F, operands: [:rega, :regn, :litn],
+        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] % rhs },
         description: <<-DESC
-          Find remainder of division of register b by literal c.
-          Place result in register a.
+          Find remainder of division of operand register and literal and store
+          result in destination register.
         DESC
 
     end

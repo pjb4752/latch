@@ -5,6 +5,9 @@ module Latch
                      :lita, :litn, :lits, :litk, :litm,
                      :glba, :glbn, :glbs, :glbk, :glbm]
 
+    MIN_OPCODE = 0x01
+    MAX_OPCODE = 0x3F
+
     def self.included(base)
       base.extend(ClassMethods)
       @instructions ||= {}
@@ -17,8 +20,10 @@ module Latch
     module Validation
       InvalidInstructionError = Class.new(StandardError)
 
-      def validate(name, operands, operation)
-        if operation.nil?
+      def validate(name, opcode, operands, operation)
+        if opcode < MIN_OPCODE || opcode >= MAX_OPCODE
+          fail_instruction(name, 'opcode out of valid range')
+        elsif operation.nil?
           fail_instruction(name, 'no operation given')
         elsif operands.size != operation.arity
           fail_instruction(name, 'arity mismatch')
@@ -46,37 +51,26 @@ module Latch
         CpuArch.instructions
       end
 
-      def register?(type)
-        type == :reg
-      end
-
-      def numeric_literal?(type)
-        type == :num
-      end
-
-      def string_literal?(type)
-        type == :str
-      end
-
-      def instruction(name, operands: [], operation: nil, description: 'Nodoc')
-        if !instructions.key?(name)
-          validate(name, operands, operation)
-
-          instruction = Instruction.new(name, operands, operation, description)
-          instructions[name] = instruction
+      def instruction(name, opcode: nil, operands: [], operation: nil,
+                      description: 'No description given')
+        if !instructions.key?(opcode)
+          validate(name, opcode, operands, operation)
+          instructions[opcode] = Instruction.new(name, opcode, operands,
+                                                 operation, description)
         else
-          fail_instruction(name, 'already defined')
+          fail_instruction(opcode, 'already defined')
         end
       end
     end
 
     class Instruction
 
-      attr_reader :name, :operands, :operation, :description
+      attr_reader :name, :opcode, :operands, :operation, :description
 
-      def initialize(name, operands, operation, description)
+      def initialize(name, opcode, operands, operation, description)
         @name = name
         @operands = operands
+        @opcode = opcode
         @operation = operation
         @description = description
       end

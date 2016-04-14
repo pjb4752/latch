@@ -5,34 +5,34 @@ module Latch
     module Memory
       include CpuArch
 
-      instruction :mov, operands: [:rega, :rega],
-        operation: ->(dst, val) { r[dst] = val },
+      instruction :loadl, opcode: 0x01, operands: [:rega, :lita],
+        operation: ->(dst, val) { reg[dst] = val },
         description: <<-DESC
-          Copy register value b into register a.
+          Load literal value into destination register.
         DESC
 
-      instruction :movret, operands: [:rega],
-        operation: ->(dst) { r[dst] = ret },
+      instruction :storg, opcode: 0x02, operands: [:glba, :rega],
+        operation: ->(dst, src) { glb[dst] = reg[src] },
         description: <<-DESC
-          Copy special return register into register a.
+          Copy source register into destination global.
         DESC
 
-      instruction :loadl, operands: [:rega, :lita],
-        operation: ->(dst, val) { r[dst] = val },
+      instruction :loadg, opcode: 0x03, operands: [:rega, :glba],
+        operation: ->(dst, src) { reg[dst] = glb[src] },
         description: <<-DESC
-          Load literal b into register a.
+          Copy source global into destination register.
         DESC
 
-      instruction :storg, operands: [:glba, :rega],
-        operation: ->(dst, val) { g[dst] = val },
+      instruction :mov, opcode: 0x04, operands: [:rega, :rega],
+        operation: ->(dst, src) { reg[dst] = reg[src] },
         description: <<-DESC
-          Store register b into global value a.
+          Copy source register into destination register.
         DESC
 
-      instruction :loadg, operands: [:rega, :glba],
-        operation: ->(dst, val) { g[dst] },
+      instruction :movret, opcode: 0x05, operands: [:rega],
+        operation: ->(dst) { reg[dst] = rvl },
         description: <<-DESC
-          Load global value b into register a.
+          Copy special return register into destination register.
         DESC
 
    end
