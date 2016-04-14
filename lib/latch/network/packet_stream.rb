@@ -54,7 +54,7 @@ module Latch
         elsif packet[:type] == :instruction
           InstructionPacket.new(packet)
         else
-          raise BadPacketError, 'invalid packed type'
+          raise BadPacketError, 'invalid packet type'
         end
       end
     end
