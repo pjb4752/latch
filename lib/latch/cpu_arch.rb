@@ -50,8 +50,8 @@ module Latch
                       description: 'No description given')
         if !instructions.key?(opcode)
           validate(name, opcode, operands, operation)
-          instructions[opcode] = Instruction.new(name, opcode, operands,
-                                                 operation, description)
+          instructions[opcode] = Instruction.new(
+            name, opcode, operands, operation, description)
         else
           fail_instruction(opcode, 'already defined')
         end
