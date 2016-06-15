@@ -1,5 +1,5 @@
 require 'latch/cpu_arch'
-require 'latch/instruction'
+require 'latch/cpu_arch/decoder'
 require 'latch/instruction_set/all'
 
 require 'observer'
@@ -11,11 +11,13 @@ module Latch
 
     class State
       attr_reader :globals, :registers
-      attr_accessor :cmp_register, :ret_register
+      attr_accessor :instructions, :opcodes, :cmp_register, :ret_register
 
       def initialize
         @globals = {}
         @registers = []
+        @instructions = []
+        @opcodes = []
 
         # special registers
         @cmp_register = nil
@@ -23,10 +25,14 @@ module Latch
       end
     end
 
-    attr_reader :state
+    attr_reader :state, :decoder
 
     def initialize(state = State.new)
       @state = state
+      @state.instructions = self.class.instructions
+      @state.opcodes = self.class.opcodes
+
+      @decoder = Decoder.new(@state)
     end
 
     def reg
@@ -54,8 +60,8 @@ module Latch
     end
 
     def execute(bytecode)
-      instruction = Instructions.decode(bytecode)
-      instruction_execute(instruction)
+      opcode, operands = decoder.decode(bytecode)
+      instruction_execute(opcode, operands)
 
       changed # let Observable know state has changed
       notify_observers(instruction, state)
@@ -63,9 +69,9 @@ module Latch
 
     private
 
-    def instruction_execute(instruction)
-      instr = self.class.instructions[instruction.opcode]
-      instr.execute(self, *instruction.operands)
+    def instruction_execute(opcode, operands)
+      instr = self.class.instructions[opcode]
+      instr.execute(self, *operands)
     end
   end
 end

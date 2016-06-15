@@ -1,12 +1,30 @@
+require 'latch/cpu_arch/instruction'
+require 'latch/cpu_arch/validation'
+
 module Latch
   module CpuArch
 
-    OPERAND_TYPES = [:rega, :regn, :regs, :regk, :regm,
-                     :lita, :litn, :lits, :litk, :litm,
-                     :glba, :glbn, :glbs, :glbk, :glbm]
+    # prefix explanations:
+    # reg - register
+    # glb - global
+    # lit - literal
+    #
+    # suffix explanations:
+    # a - any type
+    # d - destination
+    # n - number
+    # s - string
+    # k - keyword
+    # m - symbol
+    OPERAND_TYPES = [:rega, :regd, :regn, :regs, :regk, :regm,
+                     :glba, :glbd, :glbn, :glbs, :glbk, :glbm,
+                     :lita,        :litn, :lits, :litk, :litm]
 
     MIN_OPCODE = 0x01
     MAX_OPCODE = 0x3F
+
+    MIN_REGISTER = 0x01
+    MAX_REGISTER = 0xFFFF
 
     def self.included(base)
       base.extend(ClassMethods)
@@ -17,38 +35,15 @@ module Latch
       attr_reader :instructions
     end
 
-    module Validation
-      InvalidInstructionError = Class.new(StandardError)
-
-      def validate(name, opcode, operands, operation)
-        if opcode < MIN_OPCODE || opcode >= MAX_OPCODE
-          fail_instruction(name, 'opcode out of valid range')
-        elsif operation.nil?
-          fail_instruction(name, 'no operation given')
-        elsif operands.size != operation.arity
-          fail_instruction(name, 'arity mismatch')
-        elsif !valid_operand_types?(operands)
-          fail_instruction(name, 'invalid operand type')
-        end
-      end
-
-      def fail_instruction(name, error)
-        message = "bad instruction definition '#{name}': #{error}"
-        raise InvalidInstructionError, message
-      end
-
-      private
-
-      def valid_operand_types?(operands)
-        operands.all? { |a| OPERAND_TYPES.include?(a) }
-      end
-    end
-
     module ClassMethods
       include Validation
 
       def instructions
         CpuArch.instructions
+      end
+
+      def opcodes
+        CpuArch.instructions.keys
       end
 
       def instruction(name, opcode: nil, operands: [], operation: nil,
@@ -60,27 +55,6 @@ module Latch
         else
           fail_instruction(opcode, 'already defined')
         end
-      end
-    end
-
-    class Instruction
-
-      attr_reader :name, :opcode, :operands, :operation, :description
-
-      def initialize(name, opcode, operands, operation, description)
-        @name = name
-        @operands = operands
-        @opcode = opcode
-        @operation = operation
-        @description = description
-      end
-
-      def execute(cpu, *parameters)
-        cpu.instance_exec(*parameters, &operation)
-      end
-
-      def arity
-        operands.size
       end
     end
   end

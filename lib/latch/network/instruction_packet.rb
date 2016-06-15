@@ -12,16 +12,8 @@ module Latch
         data[:opcode]
       end
 
-      def first
-        data[:first]
-      end
-
-      def second
-        data[:second]
-      end
-
-      def third
-        data[:third]
+      def operands
+        data[:operands]
       end
     end
   end
