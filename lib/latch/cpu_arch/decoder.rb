@@ -49,7 +49,7 @@ module Latch
         when :regd
           validate_register_bounds(value)
         when :glbd
-          validate_global_exists(value)
+          value # currently nothing to check here
         when :rega, :regn, :regs, :regk, :regm
           value = validate_register_bounds(value)
           validate_type(label, cpu_state.registers[value])
