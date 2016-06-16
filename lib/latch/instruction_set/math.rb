@@ -46,6 +46,7 @@ module Latch
       instruction :modr, opcode: 0x0A, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value % rhs.value)
+        },
         description: <<-DESC
           Find remainder of division of operand registers and store result in
           destination register.
