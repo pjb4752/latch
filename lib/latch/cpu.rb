@@ -64,7 +64,8 @@ module Latch
       instruction_execute(opcode, operands)
 
       changed # let Observable know state has changed
-      notify_observers(opcode, operands, state)
+      opcode_name = self.class.instructions[opcode].name
+      notify_observers(opcode_name, opcode, operands, state)
     end
 
     private

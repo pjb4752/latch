@@ -9,8 +9,8 @@ module Latch
       @globals = {}
     end
 
-    def update(opcode, operands, cpu_state)
-      @instructions << [opcode, operands]
+    def update(opcode_name, opcode, operands, cpu_state)
+      @instructions << [opcode_name, opcode, operands]
       @registers = cpu_state.registers
       @globals = cpu_state.globals
     end
