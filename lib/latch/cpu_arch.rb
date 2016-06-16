@@ -23,7 +23,7 @@ module Latch
     MIN_OPCODE = 0x01
     MAX_OPCODE = 0x3F
 
-    MIN_REGISTER = 0x01
+    MIN_REGISTER = 0x0001
     MAX_REGISTER = 0xFFFF
 
     def self.included(base)

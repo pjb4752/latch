@@ -6,11 +6,11 @@ module Latch
     module Control
       include CpuArch
 
-      instruction :callb, opcode: 0x16, operands: [:lits, :litn, :rega],
+      instruction :callb, opcode: 0x16, operands: [:lits, :rega, :litn],
         operation: ->(name, pos, arity) {
           arguments = []
-          pos.upto(arity - 1) do
-            |n| arguments << reg[n]
+          pos.upto(arity - 1) do |n|
+            arguments << reg[n]
           end
           rvl = Builtin.send(name, *arguments)
         },

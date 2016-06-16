@@ -64,7 +64,7 @@ module Latch
       instruction_execute(opcode, operands)
 
       changed # let Observable know state has changed
-      notify_observers(instruction, state)
+      notify_observers(opcode, operands, state)
     end
 
     private

@@ -4,6 +4,8 @@ module Latch
   module CpuArch
     class Decoder
       BadBytecodeError = Class.new(StandardError)
+      BytecodeFormatError = Class.new(StandardError)
+      BytecodeTypeError = Class.new(StandardError)
 
       attr_reader :cpu_state
 
@@ -12,14 +14,15 @@ module Latch
       end
 
       def decode(bytecode)
-        opcode = bytecode.opcode
+        parts = bytecode.split(' ')
+        opcode = parts.shift.to_i(16)
 
         if !cpu_state.opcodes.include?(opcode)
           raise BadBytecodeError, "invalid opcode #{opcode}"
         end
 
         instruction = cpu_state.instructions[opcode]
-        operands = bytecode.operands
+        operands = parts
 
         if operands.size != instruction.arity
           raise BadBytecodeError, "arity mismatch in #{opcode}"
@@ -32,7 +35,7 @@ module Latch
           end
 
           [opcode, interpreted_operands]
-        rescue ArgumentError => e
+        rescue BytecodeFormatError, BytecodeTypeError
           raise BadBytecodeError, "#{e.message} in #{opcode}"
         end
       end
@@ -46,52 +49,138 @@ module Latch
         when :glbd
           validate_global_exists(value)
         when :rega, :regn, :regs, :regk, :regm
-          validate_register_bounds(value)
+          value = validate_register_bounds(value)
           validate_type(label, cpu_state.registers[value])
         when :glba, :glbn, :glbs, :glbk, :glbm
-          check_global_exists(value)
+          value = validate_global_exists(value)
           validate_type(label, cpu_state.globals[value])
         when :lita, :litn, :lits, :litk, :litm
-          validate_type(label, value)
+          interpret_literal_type(label, value)
         else
-          raise ArgumentError, 'unknown operand label'
+          raise BytecodeFormatError, 'unknown operand label'
         end
       end
 
       def validate_register_bounds(value)
+        ivalue = value.to_i(16)
         # TODO validate against current max register, not static max
-        return value if value >= MIN_REGISTER && value <= MAX_REGISTER
-        raise ArgumentError, "register #{value} does not exist"
+        return ivalue if ivalue >= MIN_REGISTER && ivalue <= MAX_REGISTER
+        raise BytecodeFormatError, "register #{value} does not exist"
       end
 
       def validate_global_exists(value)
         return value if cpu_state.globals.key?(value)
-        raise ArgumentError, "global #{value} does not exist"
+        raise BytecodeFormatError, "global #{value} does not exist"
       end
 
       def validate_type(label, value)
         case label
-        when :rega, :glba, :lita
+        when :rega, :glba
           value
-        when :regn, :glbn, :litn
+        when :regn, :glbn
           return value if value.number?
-          raise_type_error(value.type, 'number')
-        when :regs, :glbs, :lits
+          raise_type_error('number', actual: value.type)
+        when :regs, :glbs
           return value if value.string?
-          raise_type_error(value.type, 'string')
-        when :regk, :glbk, :litk
+          raise_type_error('string', actual: value.type)
+        when :regk, :glbk
           return value if value.keyword?
-          raise_type_error(value.type, 'keyword')
-        when :regm, :glbm, :litm
+          raise_type_error('keyword', actual: value.type)
+        when :regm, :glbm
           return value if value.symbol?
-          raise_type_error(value.type, 'symbol')
+          raise_type_error('symbol', actual: value.type)
         else
-          raise ArgumentError, "unknown type label #{label}"
+          raise BytecodeTypeError, "unknown type label #{label}"
         end
       end
 
-      def raise_type_error(actual, expected)
-        raise ArgumentError, "expected #{expected}, got #{actual}"
+      def interpret_literal_type(label, value)
+        case label
+        when :lita
+          type = determine_type(value)
+          send(:"interpret_#{type}", value)
+        when :litn
+          interpret_number(value)
+        when :lits
+          interpret_string(value)
+        when :litk
+          interpret_keyword(value)
+        when :litm
+          interpret_symbol(value)
+        end
+      end
+
+      def determine_type(value)
+        case
+        when number?(value)
+          :number
+        when string?(value)
+          :string
+        when keyword?(value)
+          :keyword
+        when symbol?(value)
+          :symbol
+        else
+          raise BytecodeTypeError, "unknown literal type for #{value}"
+        end
+      end
+
+      def number?(value)
+        value[0] =~ /\d/
+      end
+
+      def string?(value)
+        value[0] == '"'
+      end
+
+      def keyword?(value)
+        value[0] == ':'
+      end
+
+      def symbol?(value)
+        value[0] =~ /[a-zA-Z+\-*\/%_=<>]/
+      end
+
+      def interpret_number(value)
+        if number?(value)
+          raw_value = value.to_i(16)
+          Tether::Types::Number.new(raw_value)
+        else
+          raise_type_error('number')
+        end
+      end
+
+      def interpret_string(value)
+        if string?(value)
+          raw_value = value.slice!(1, value.size)
+          Tether::Types::String.new(raw_value)
+        else
+          raise_type_error('string')
+        end
+      end
+
+      def interpret_keyword(value)
+        if keyword?(value)
+          raw_value = value.slice!(1, value.size)
+          Tether::Types::Keyword.new(raw_value)
+        else
+          raise_type_error('keyword')
+        end
+      end
+
+      def interpret_symbol(value)
+        if symbol?(value)
+          Tether::Types::Symbol.new(value)
+        else
+          raise_type_error('symbol')
+        end
+      end
+
+      def raise_type_error(expected, actual: nil)
+        message = "expected #{expected}"
+        message << ", actual #{actual}" unless actual.nil?
+
+        raise BytecodeTypeError, message
       end
     end
   end

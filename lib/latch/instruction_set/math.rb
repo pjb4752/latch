@@ -1,4 +1,5 @@
 require 'latch/cpu_arch'
+require 'tether/types/all'
 
 module Latch
   module InstructionSet
@@ -7,7 +8,9 @@ module Latch
 
       # register-based arithmetic
       instruction :addr, opcode: 0x06, operands: [:regd, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] + reg[rhs] },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value + rhs.value)
+        },
         description: <<-DESC
           Add contents of operand registers and store result in destination
           register.
@@ -43,7 +46,9 @@ module Latch
 
       # literal-based arithmetic
       instruction :addl, opcode: 0x0B, operands: [:regd, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] + rhs },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value + rhs.value)
+        },
         description: <<-DESC
           Add contents of operand register and literal and store results in
           destination register.
