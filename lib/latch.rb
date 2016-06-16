@@ -19,6 +19,8 @@ module Latch
 
         print_instructions(monitor.instructions)
         print_registers(monitor.registers)
+        print_globals(monitor.globals)
+        puts
       end
     end
 
@@ -39,7 +41,13 @@ module Latch
         next if i == 0
         puts "#{i}: #{r}"
       end
-      puts
+    end
+
+    def print_globals(globals)
+      puts '-- Globals --'
+      globals.each_pair do |i, g|
+        puts "#{i}: #{g}"
+      end
     end
   end
 
