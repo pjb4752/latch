@@ -17,28 +17,35 @@ module Latch
         DESC
 
       instruction :subr, opcode: 0x07, operands: [:regd, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] - reg[rhs] },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value - rhs.value)
+        },
         description: <<-DESC
           Subtract contents of operand registers and store result in
           destination register.
         DESC
 
       instruction :mulr, opcode: 0x08, operands: [:regd, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] * reg[rhs] },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value * rhs.value)
+        },
         description: <<-DESC
           Multiply contents of operand registers and store result in
           destination register.
         DESC
 
       instruction :divr, opcode: 0x09, operands: [:regd, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] / reg[rhs] },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value / rhs.value)
+        },
         description: <<-DESC
           Divide contents of operand registers and store result in destination
           register.
         DESC
 
       instruction :modr, opcode: 0x0A, operands: [:regd, :regn, :regn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] % reg[rhs] },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value % rhs.value)
         description: <<-DESC
           Find remainder of division of operand registers and store result in
           destination register.
@@ -55,28 +62,36 @@ module Latch
         DESC
 
       instruction :subl, opcode: 0x0C, operands: [:regd, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] - rhs },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value - rhs.value)
+        },
         description: <<-DESC
           Subtract contents of operand register and literal and store results
           in destination register.
         DESC
 
       instruction :mull, opcode: 0x0D, operands: [:regd, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] * rhs },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value * rhs.value)
+        },
         description: <<-DESC
           Multiply contents of operand register and literal and store results
           in destination register.
         DESC
 
       instruction :divl, opcode: 0x0E, operands: [:regd, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] / rhs },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value / rhs.value)
+        },
         description: <<-DESC
           Divide contents of operand register and literal and store results in
           destination register.
         DESC
 
       instruction :modl, opcode: 0x0F, operands: [:regd, :regn, :litn],
-        operation: ->(dst, lhs, rhs) { reg[dst] = reg[lhs] % rhs },
+        operation: ->(dst, lhs, rhs) {
+          reg[dst] = Tether::Types::Number.new(lhs.value % rhs.value)
+        },
         description: <<-DESC
           Find remainder of division of operand register and literal and store
           result in destination register.
