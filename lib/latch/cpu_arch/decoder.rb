@@ -65,12 +65,13 @@ module Latch
 
       def validate_register_bounds(value)
         ivalue = value.to_i(16)
-        # TODO validate against current max register, not static max
+
         return ivalue if ivalue >= MIN_REGISTER && ivalue <= MAX_REGISTER
         raise BytecodeFormatError, "register #{value} does not exist"
       end
 
       def validate_global_exists(value)
+
         return value if cpu_state.globals.key?(value)
         raise BytecodeFormatError, "global #{value} does not exist"
       end
