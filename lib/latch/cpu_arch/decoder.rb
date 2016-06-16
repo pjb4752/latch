@@ -35,8 +35,10 @@ module Latch
           end
 
           [opcode, interpreted_operands]
-        rescue BytecodeFormatError, BytecodeTypeError
-          raise BadBytecodeError, "#{e.message} in #{opcode}"
+        rescue BytecodeFormatError => bfe
+          raise BadBytecodeError, "format error '#{bfe.message}' in #{opcode}"
+        rescue BytecodeTypeError => bte
+          raise BadBytecodeError, "type error '#{bte.message}' in #{opcode}"
         end
       end
 
