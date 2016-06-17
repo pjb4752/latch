@@ -50,6 +50,14 @@ module Latch
           instruction immediately following that label.
         DESC
 
+      instruction :jmpt, opcode: 0x2B, operands: [:litm],
+        operation: ->(label) { puts 'not implemented' },
+        description: <<-DESC
+          Conditionally jump to label a if the previous test returned true.
+          If the jump is made, the next instruction executed will be the
+          instruction immediately following that label.
+        DESC
+
     end
   end
 end
