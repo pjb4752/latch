@@ -14,25 +14,25 @@ module Latch
         DESC
 
       instruction :storg, opcode: 0x02, operands: [:glbd, :rega],
-        operation: ->(dst, src) { glb[dst] = src },
+        operation: ->(dst, src) { glb[dst] = reg[src] },
         description: <<-DESC
           Copy source register into destination global.
         DESC
 
       instruction :loadg, opcode: 0x03, operands: [:regd, :glba],
-        operation: ->(dst, src) { reg[dst] = src },
+        operation: ->(dst, src) { reg[dst] = glb[src] },
         description: <<-DESC
           Copy source global into destination register.
         DESC
 
       instruction :mov, opcode: 0x04, operands: [:regd, :rega],
-        operation: ->(dst, src) { reg[dst] = src },
+        operation: ->(dst, src) { reg[dst] = reg[src] },
         description: <<-DESC
           Copy source register into destination register.
         DESC
 
       instruction :movcmp, opcode: 0x05, operands: [:regd],
-        operation: ->(dst) { reg[dst] = cmp },
+        operation: ->(dst) { reg[dst] = Tether::Types::Boolean.new(cmp) },
         description: <<-DESC
           Copy special compare register into destination register.
         DESC

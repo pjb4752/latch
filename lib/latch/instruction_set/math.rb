@@ -11,7 +11,8 @@ module Latch
       # register-based arithmetic
       instruction :addr, opcode: 0x0B, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value + rhs.value)
+          result = reg[lhs].value + reg[rhs].value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Add contents of operand registers and store result in destination
@@ -20,7 +21,8 @@ module Latch
 
       instruction :subr, opcode: 0x0C, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value - rhs.value)
+          result = reg[lhs].value - reg[rhs].value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Subtract contents of operand registers and store result in
@@ -29,7 +31,8 @@ module Latch
 
       instruction :mulr, opcode: 0x0D, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value * rhs.value)
+          result = reg[lhs].value * reg[rhs].value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Multiply contents of operand registers and store result in
@@ -38,7 +41,8 @@ module Latch
 
       instruction :divr, opcode: 0x0E, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value / rhs.value)
+          result = reg[lhs].value / reg[rhs].value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Divide contents of operand registers and store result in destination
@@ -47,7 +51,8 @@ module Latch
 
       instruction :modr, opcode: 0x0F, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value % rhs.value)
+          result = reg[lhs].value % reg[rhs].value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Find remainder of division of operand registers and store result in
@@ -57,7 +62,8 @@ module Latch
       # literal-based arithmetic
       instruction :addl, opcode: 0x10, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value + rhs.value)
+          result = reg[lhs].value + rhs.value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Add contents of operand register and literal and store results in
@@ -66,7 +72,8 @@ module Latch
 
       instruction :subl, opcode: 0x11, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value - rhs.value)
+          result = reg[lhs].value - rhs.value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Subtract contents of operand register and literal and store results
@@ -75,7 +82,8 @@ module Latch
 
       instruction :mull, opcode: 0x12, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value * rhs.value)
+          result = reg[lhs].value * rhs.value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Multiply contents of operand register and literal and store results
@@ -84,7 +92,8 @@ module Latch
 
       instruction :divl, opcode: 0x13, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value / rhs.value)
+          result = reg[lhs].value / rhs.value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Divide contents of operand register and literal and store results in
@@ -93,7 +102,8 @@ module Latch
 
       instruction :modl, opcode: 0x14, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
-          reg[dst] = Tether::Types::Number.new(lhs.value % rhs.value)
+          result = reg[lhs].value % rhs.value
+          reg[dst] = Tether::Types::Number.new(result)
         },
         description: <<-DESC
           Find remainder of division of operand register and literal and store

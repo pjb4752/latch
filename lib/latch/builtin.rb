@@ -1,8 +1,8 @@
 module Latch
   module Builtin
 
-    def print(string)
-      puts string
+    def self.print(value)
+      puts value
     end
   end
 end

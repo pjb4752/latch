@@ -11,10 +11,10 @@ module Latch
       instruction :callb, opcode: 0x26, operands: [:litm, :rega, :litn],
         operation: ->(name, pos, arity) {
           arguments = []
-          pos.upto(arity.value - 1) do |n|
-            arguments << reg[n]
+          arity.value.times do |i|
+            arguments << reg[pos + i]
           end
-          self.ret = Builtin.send(name, *arguments)
+          self.ret = Builtin.send(name.value, *arguments)
         },
         description: <<-DESC
           Calls builtin function matching name, passing arguments

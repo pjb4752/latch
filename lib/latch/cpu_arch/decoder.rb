@@ -53,9 +53,11 @@ module Latch
         when :rega, :regn, :regs, :regk, :regm
           value = validate_register_bounds(value)
           validate_type(label, cpu_state.registers[value])
+          value
         when :glba, :glbn, :glbs, :glbk, :glbm
           value = validate_global_exists(value)
           validate_type(label, cpu_state.globals[value])
+          value
         when :lita, :litn, :lits, :litk, :litm
           interpret_literal_type(label, value)
         else
