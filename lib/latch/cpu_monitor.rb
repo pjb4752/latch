@@ -1,7 +1,7 @@
 module Latch
   class CpuMonitor
 
-    attr_reader :instructions, :registers, :globals, :cmp, :ret
+    attr_reader :instructions, :registers, :globals, :cmp, :ret, :isp
 
     def initialize
       @instructions = []
@@ -9,6 +9,7 @@ module Latch
       @globals = {}
       @cmp = nil
       @ret = nil
+      @isp = nil
     end
 
     def update(opcode_name, opcode, operands, cpu_state)
@@ -17,6 +18,7 @@ module Latch
       @globals = cpu_state.globals
       @cmp = cpu_state.cmp_register
       @ret = cpu_state.ret_register
+      @isp = cpu_state.isp_register
     end
 
     def display(io)
@@ -53,6 +55,7 @@ module Latch
       io.puts '-- Registers --'
       io.puts "cmp: #{cmp}"
       io.puts "ret: #{ret}"
+      io.puts "isp: #{isp}"
       registers.each_with_index do |r, i|
         next if i == 0
         io.puts "#{i}: #{r}"

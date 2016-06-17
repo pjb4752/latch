@@ -11,7 +11,8 @@ module Latch
 
     class State
       attr_reader :globals, :registers
-      attr_accessor :instructions, :opcodes, :cmp_register, :ret_register
+      attr_accessor :instructions, :opcodes, :cmp_register,
+        :ret_register, :isp_register
 
       def initialize
         @globals = {}
@@ -22,6 +23,7 @@ module Latch
         # special registers
         @cmp_register = nil
         @ret_register = nil
+        @isp_register = 0
       end
     end
 
@@ -59,13 +61,33 @@ module Latch
       state.ret_register = value
     end
 
-    def execute(bytecode)
-      opcode, operands = decoder.decode(bytecode)
-      instruction_execute(opcode, operands)
+    def isp
+      state.isp_register
+    end
 
-      changed # let Observable know state has changed
-      opcode_name = self.class.instructions[opcode].name
-      notify_observers(opcode_name, opcode, operands, state)
+    def isp=(value)
+      state.isp_register = value
+    end
+
+    def execute(bytecode)
+      loop do
+        break if isp >= bytecode.size
+        if bytecode[isp] =~ /\A\s*#.*/ # skip comments
+          self.isp += 1
+          next
+        end
+
+        opcode, operands = decoder.decode(bytecode[isp])
+        instruction_execute(opcode, operands)
+
+        changed # let Observable know state has changed
+        opcode_name = self.class.instructions[opcode].name
+        notify_observers(opcode_name, opcode, operands, state)
+
+        yield if block_given?
+
+        self.isp += 1
+      end
     end
 
     private

@@ -13,9 +13,8 @@ module Latch
       @monitor = monitor
     end
 
-    def run(stream)
-      stream.each_line do |bytecode|
-        cpu.execute(bytecode)
+    def run(bytecode)
+      cpu.execute(bytecode) do
         monitor.display($stdout)
       end
     end
@@ -25,9 +24,8 @@ module Latch
     if ARGV[0].nil?
       $stderr.puts 'which bytecode file to run?'
     else
-      File.open(ARGV[0]) do |io|
-        Vm.new.run(io)
-      end
+      bytecode = File.readlines(ARGV[0])
+      Vm.new.run(bytecode)
     end
   end
 end
