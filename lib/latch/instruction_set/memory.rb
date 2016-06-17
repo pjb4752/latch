@@ -5,6 +5,8 @@ module Latch
     module Memory
       include CpuArch
 
+      # reserving opcode slots 0x01 - 0x0A
+
       instruction :loadl, opcode: 0x01, operands: [:regd, :lita],
         operation: ->(dst, val) { reg[dst] = val },
         description: <<-DESC
@@ -29,8 +31,14 @@ module Latch
           Copy source register into destination register.
         DESC
 
-      instruction :movret, opcode: 0x05, operands: [:regd],
-        operation: ->(dst) { reg[dst] = rvl },
+      instruction :movcmp, opcode: 0x05, operands: [:regd],
+        operation: ->(dst) { reg[dst] = cmp },
+        description: <<-DESC
+          Copy special compare register into destination register.
+        DESC
+
+      instruction :movret, opcode: 0x06, operands: [:regd],
+        operation: ->(dst) { reg[dst] = ret },
         description: <<-DESC
           Copy special return register into destination register.
         DESC

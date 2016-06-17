@@ -6,41 +6,43 @@ module Latch
     module Control
       include CpuArch
 
-      instruction :callb, opcode: 0x16, operands: [:lits, :rega, :litn],
+      # reserving opcode slots 0x26 - ???
+
+      instruction :callb, opcode: 0x26, operands: [:litm, :rega, :litn],
         operation: ->(name, pos, arity) {
           arguments = []
-          pos.upto(arity - 1) do |n|
+          pos.upto(arity.value - 1) do |n|
             arguments << reg[n]
           end
-          rvl = Builtin.send(name, *arguments)
+          self.ret = Builtin.send(name, *arguments)
         },
         description: <<-DESC
           Calls builtin function matching name, passing arguments
           starting from register a to register a + (arity - 1).
         DESC
 
-      instruction :callfn, opcode: 0x17, operands: [:lits, :litn, :rega],
-        operation: ->(label, arity, pos) { puts 'not implemented' },
+      instruction :callfn, opcode: 0x27, operands: [:lits, :rega, :litn],
+        operation: ->(label, pos, arity) { puts 'not implemented' },
         description: <<-DESC
           Calls user function at label a, passing arguments
           starting from register a to regiister a + (arity - 1).
         DESC
 
-      instruction :retfn, opcode: 0x18, operands: [:rega],
+      instruction :retfn, opcode: 0x28, operands: [:rega],
         operation: ->(retval) { puts 'not implemented' },
         description: <<-DESC
           Return from current function execution, copying value in register a
           into the special return register.
         DESC
 
-      instruction :jmp, opcode: 0x19, operands: [:lits],
+      instruction :jmp, opcode: 0x29, operands: [:litm],
         operation: ->(label) { puts 'not implemented' },
         description: <<-DESC
           Unconditionally jump to label a. The next instruction executed
           will be the instruction immediately following that label.
         DESC
 
-      instruction :jmpf, opcode: 0x1A, operands: [:lits],
+      instruction :jmpf, opcode: 0x2A, operands: [:litm],
         operation: ->(label) { puts 'not implemented' },
         description: <<-DESC
           Conditionally jump to label a if the previous test returned false.

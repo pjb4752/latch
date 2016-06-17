@@ -51,11 +51,11 @@ module Latch
       state.cmp_register = value
     end
 
-    def rvl
+    def ret
       state.ret_register
     end
 
-    def rvl=(value)
+    def ret=(value)
       state.ret_register = value
     end
 

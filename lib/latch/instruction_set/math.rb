@@ -6,8 +6,10 @@ module Latch
     module Math
       include CpuArch
 
+      # reserving opcode slots 0x0B - 0x1A
+
       # register-based arithmetic
-      instruction :addr, opcode: 0x06, operands: [:regd, :regn, :regn],
+      instruction :addr, opcode: 0x0B, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value + rhs.value)
         },
@@ -16,7 +18,7 @@ module Latch
           register.
         DESC
 
-      instruction :subr, opcode: 0x07, operands: [:regd, :regn, :regn],
+      instruction :subr, opcode: 0x0C, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value - rhs.value)
         },
@@ -25,7 +27,7 @@ module Latch
           destination register.
         DESC
 
-      instruction :mulr, opcode: 0x08, operands: [:regd, :regn, :regn],
+      instruction :mulr, opcode: 0x0D, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value * rhs.value)
         },
@@ -34,7 +36,7 @@ module Latch
           destination register.
         DESC
 
-      instruction :divr, opcode: 0x09, operands: [:regd, :regn, :regn],
+      instruction :divr, opcode: 0x0E, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value / rhs.value)
         },
@@ -43,7 +45,7 @@ module Latch
           register.
         DESC
 
-      instruction :modr, opcode: 0x0A, operands: [:regd, :regn, :regn],
+      instruction :modr, opcode: 0x0F, operands: [:regd, :regn, :regn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value % rhs.value)
         },
@@ -53,7 +55,7 @@ module Latch
         DESC
 
       # literal-based arithmetic
-      instruction :addl, opcode: 0x0B, operands: [:regd, :regn, :litn],
+      instruction :addl, opcode: 0x10, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value + rhs.value)
         },
@@ -62,7 +64,7 @@ module Latch
           destination register.
         DESC
 
-      instruction :subl, opcode: 0x0C, operands: [:regd, :regn, :litn],
+      instruction :subl, opcode: 0x11, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value - rhs.value)
         },
@@ -71,7 +73,7 @@ module Latch
           in destination register.
         DESC
 
-      instruction :mull, opcode: 0x0D, operands: [:regd, :regn, :litn],
+      instruction :mull, opcode: 0x12, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value * rhs.value)
         },
@@ -80,7 +82,7 @@ module Latch
           in destination register.
         DESC
 
-      instruction :divl, opcode: 0x0E, operands: [:regd, :regn, :litn],
+      instruction :divl, opcode: 0x13, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value / rhs.value)
         },
@@ -89,7 +91,7 @@ module Latch
           destination register.
         DESC
 
-      instruction :modl, opcode: 0x0F, operands: [:regd, :regn, :litn],
+      instruction :modl, opcode: 0x14, operands: [:regd, :regn, :litn],
         operation: ->(dst, lhs, rhs) {
           reg[dst] = Tether::Types::Number.new(lhs.value % rhs.value)
         },
