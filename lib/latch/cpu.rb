@@ -72,10 +72,6 @@ module Latch
     def execute(bytecode)
       loop do
         break if isp >= bytecode.size
-        if bytecode[isp] =~ /\A\s*#.*/ # skip comments
-          self.isp += 1
-          next
-        end
 
         opcode, operands = decoder.decode(bytecode[isp])
         instruction_execute(opcode, operands)
