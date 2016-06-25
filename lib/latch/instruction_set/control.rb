@@ -21,7 +21,6 @@ module Latch
           starting from register a to register a + (arity - 1).
         DESC
 
-
       # to call function
       # r[0] = function object
       # r[1] = first arg
@@ -73,7 +72,11 @@ module Latch
           if stp == 0
             shutdown
           else
+            # TODO seems unnecesary. can just rval into reg[-1] replacing
+            # the function from which the call originated.
+            # would save an instruction after returning from a function
             self.ret = reg[pos]
+            # old isp value is always in the current bottom - 1
             self.isp = reg[-1]
             # old stp value is always in the current bottom
             self.stp = reg[0]
