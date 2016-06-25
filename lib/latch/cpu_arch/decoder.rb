@@ -50,7 +50,7 @@ module Latch
           validate_register_bounds(value)
         when :glbd
           value # currently nothing to check here
-        when :rega, :regn, :regs, :regk, :regm
+        when :rega, :regn, :regs, :regk, :regm, :regf
           value = validate_register_bounds(value)
           validate_type(label, cpu_state.registers[value])
           value
@@ -94,6 +94,9 @@ module Latch
         when :regm, :glbm
           return value if value.symbol?
           raise_type_error('symbol', actual: value.type)
+        when :regf
+          return value if value.function?
+          raise_type_error('function', actual: value.type)
         else
           raise BytecodeTypeError, "unknown type label #{label}"
         end

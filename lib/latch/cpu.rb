@@ -1,4 +1,5 @@
 require 'latch/cpu_arch'
+require 'latch/cpu_arch/array_frame'
 require 'latch/cpu_arch/decoder'
 require 'latch/instruction_set/all'
 
@@ -10,20 +11,21 @@ module Latch
     include Observable
 
     class State
-      attr_reader :globals, :registers
+      attr_reader :registers, :globals
       attr_accessor :instructions, :opcodes, :cmp_register,
-        :ret_register, :isp_register
+        :ret_register, :isp_register, :stp_register
 
       def initialize
-        @globals = {}
-        @registers = []
-        @instructions = []
-        @opcodes = []
-
         # special registers
         @cmp_register = nil
         @ret_register = nil
         @isp_register = 0
+        @stp_register = 0
+
+        @registers = CpuArch::ArrayFrame.new(self)
+        @globals = {}
+        @instructions = []
+        @opcodes = []
       end
     end
 
@@ -69,16 +71,24 @@ module Latch
       state.isp_register = value
     end
 
-    def execute(bytecode)
-      loop do
-        break if isp >= bytecode.size
+    def stp
+      state.stp_register
+    end
 
-        opcode, operands = decoder.decode(bytecode[isp])
-        instruction_execute(opcode, operands)
+    def stp=(value)
+      state.stp_register = value
+    end
 
-        changed # let Observable know state has changed
-        opcode_name = self.class.instructions[opcode].name
-        notify_observers(opcode_name, opcode, operands, state)
+    def shutdown
+      exit 0
+    end
+
+    def execute(bytecode, addr)
+      self.isp = addr
+
+      while isp < bytecode.size
+        opcode, operands = execute_bytecode(bytecode[isp])
+        update_observables(opcode, operands)
 
         yield if block_given?
 
@@ -88,9 +98,18 @@ module Latch
 
     private
 
-    def instruction_execute(opcode, operands)
+    def execute_bytecode(bytecode)
+      opcode, operands = decoder.decode(bytecode)
       instr = self.class.instructions[opcode]
       instr.execute(self, *operands)
+
+      [opcode, operands]
+    end
+
+    def update_observables(opcode, operands)
+      changed # let Observable know state has changed
+      opcode_name = self.class.instructions[opcode].name
+      notify_observers(opcode_name, opcode, operands, state)
     end
   end
 end

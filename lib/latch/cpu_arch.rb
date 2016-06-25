@@ -16,9 +16,10 @@ module Latch
     # s - string
     # k - keyword
     # m - symbol
-    OPERAND_TYPES = [:rega, :regd, :regn, :regs, :regk, :regm,
-                     :glba, :glbd, :glbn, :glbs, :glbk, :glbm,
-                     :lita,        :litn, :lits, :litk, :litm]
+    # f - function
+    OPERAND_TYPES = [:rega, :regd, :regn, :regs, :regk, :regm, :regf,
+                     :glba, :glbd, :glbn, :glbs, :glbk, :glbm, :glbf,
+                     :lita,        :litn, :lits, :litk, :litm        ]
 
     MIN_OPCODE = 0x01
     MAX_OPCODE = 0x3F

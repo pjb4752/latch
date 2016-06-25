@@ -13,19 +13,19 @@ module Latch
       @monitor = monitor
     end
 
-    def run(bytecode)
-      cpu.execute(bytecode) do
+    def run(bytecode, addr)
+      cpu.execute(bytecode, addr) do
         monitor.display($stdout)
       end
     end
   end
 
   def self.start
-    if ARGV[0].nil?
-      $stderr.puts 'which bytecode file to run?'
+    if ARGV[0].nil? || ARGV[1].nil?
+      $stderr.puts 'need bytecode file and start address'
     else
       bytecode = read_bytecode_file(ARGV[0])
-      Vm.new.run(bytecode)
+      Vm.new.run(bytecode, ARGV[1].to_i)
     end
   end
 
@@ -38,7 +38,10 @@ module Latch
   def self.read_bytecode(io, bytecode = [])
     io.each_line do |line|
       # skip comments in bytecode stream
-      bytecode << line unless line =~ /\A\s*#.*/
+      line = line.chomp
+      if !line.empty? && line !~ /\A\s*#.*/
+        bytecode << line
+      end
     end
 
     bytecode

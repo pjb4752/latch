@@ -6,7 +6,7 @@ module Latch
     module Control
       include CpuArch
 
-      # reserving opcode slots 0x26 - ???
+      # reserving opcode slots 0x26 - 0x2F
 
       instruction :callb, opcode: 0x26, operands: [:litm, :rega, :litn],
         operation: ->(name, pos, arity) {
@@ -21,15 +21,64 @@ module Latch
           starting from register a to register a + (arity - 1).
         DESC
 
-      instruction :callfn, opcode: 0x27, operands: [:lits, :rega, :litn],
-        operation: ->(label, pos, arity) { puts 'not implemented' },
+
+      # to call function
+      # r[0] = function object
+      # r[1] = first arg
+      # r[2] = second arg
+      # r[n] = nth arg
+      #
+      # stack frame
+      # r[n] = nth param
+      # r[3] = second param
+      # r[2] = first param
+      # r[1] = return stp
+      # r[0] = return isp
+      #
+      # so to call fn:
+      # store isp in the fn reg
+      # store stp in the fn + 1 reg
+      # copy arg refs into fn + 2 .. fn + 2 + n registers
+      # set isp to fn addr
+      # set stp to fn + 1
+      instruction :callfn, opcode: 0x27, operands: [:regf, :litn],
+        operation: ->(pos, arity) {
+          # get a ref to function type and stack pointer so we can overwrite
+          function = reg[pos]
+          tmp_stp = stp
+
+          # copy args into param slots starting at fn + 2
+          arity.value.times do |i|
+            reg[pos + 2 + i] = reg[pos + 1 + i]
+          end
+
+          # store old isp over function reg
+          # store old stp over function reg + 1
+          reg[pos] = isp
+          reg[pos + 1] = tmp_stp
+
+          # new stack pointer will be function reg + 1
+          self.stp = pos + 1
+
+          # decrease isp here since it gets incremented immediately after
+          self.isp = function.value - 1
+        },
         description: <<-DESC
-          Calls user function at label a, passing arguments
-          starting from register a to regiister a + (arity - 1).
+          Calls function in first register, passing arguments starting from
+          second register to register + (arity - 1).
         DESC
 
       instruction :retfn, opcode: 0x28, operands: [:rega],
-        operation: ->(retval) { puts 'not implemented' },
+        operation: ->(pos) {
+          if stp == 0
+            shutdown
+          else
+            self.ret = reg[pos]
+            self.isp = reg[-1]
+            # old stp value is always in the current bottom
+            self.stp = reg[0]
+          end
+        },
         description: <<-DESC
           Return from current function execution, copying value in register a
           into the special return register.
