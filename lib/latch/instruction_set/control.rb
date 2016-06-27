@@ -70,7 +70,7 @@ module Latch
       instruction :retfn, opcode: 0x28, operands: [:rega],
         operation: ->(pos) {
           if stp == 0
-            shutdown
+            exiting_main
           else
             # TODO seems unnecesary. can just rval into reg[-1] replacing
             # the function from which the call originated.
@@ -87,27 +87,24 @@ module Latch
           into the special return register.
         DESC
 
-      instruction :jmp, opcode: 0x29, operands: [:litm],
-        operation: ->(label) { puts 'not implemented' },
+      instruction :jmp, opcode: 0x29, operands: [:litn],
+        operation: ->(addr) { self.isp = addr.value - 1 },
         description: <<-DESC
-          Unconditionally jump to label a. The next instruction executed
-          will be the instruction immediately following that label.
+          Unconditionally jump execution to an address.
+      DESC
+
+      instruction :jmpf, opcode: 0x2A, operands: [:litn],
+        operation: ->(addr) { self.isp = addr.value - 1 unless cmp },
+        description: <<-DESC
+          Conditionally jump exeuction to an address if the previous
+          test returned false.
         DESC
 
-      instruction :jmpf, opcode: 0x2A, operands: [:litm],
-        operation: ->(label) { puts 'not implemented' },
+      instruction :jmpt, opcode: 0x2B, operands: [:litn],
+        operation: ->(addr) { self.isp = addr.value - 1 if cmp},
         description: <<-DESC
-          Conditionally jump to label a if the previous test returned false.
-          If the jump is made, the next instruction executed will be the
-          instruction immediately following that label.
-        DESC
-
-      instruction :jmpt, opcode: 0x2B, operands: [:litm],
-        operation: ->(label) { puts 'not implemented' },
-        description: <<-DESC
-          Conditionally jump to label a if the previous test returned true.
-          If the jump is made, the next instruction executed will be the
-          instruction immediately following that label.
+          Conditionally jump exeuction to an address if the previous
+          test returned true.
         DESC
 
     end
