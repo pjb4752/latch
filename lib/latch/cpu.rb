@@ -79,14 +79,18 @@ module Latch
       state.stp_register = value
     end
 
-    def shutdown
-      exit 0
+    def exiting_main
+      @exiting_main = true
+    end
+
+    def exiting_main?
+      @exiting_main
     end
 
     def execute(bytecode, addr)
       self.isp = addr
 
-      while isp < bytecode.size
+      while isp < bytecode.size && !exiting_main?
         opcode, operands = execute_bytecode(bytecode[isp])
         update_observables(opcode, operands)
 
